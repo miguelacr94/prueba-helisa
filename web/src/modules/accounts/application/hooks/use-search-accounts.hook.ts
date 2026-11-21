@@ -3,6 +3,9 @@ import { useDebounce } from '../../../../shared/hooks/use-debounce.hook';
 import { accountRepository } from '../../infrastructure/account-http.repository';
 import type { Account } from '../../domain/models/account.model';
 
+// Referencia estable: evita crear un nuevo arreglo en cada render (provocaría bucles en useEffect)
+const EMPTY_RESULTS: Account[] = [];
+
 export const ACCOUNTS_SEARCH_QUERY_KEY = (query: string) => ['accounts', 'search', query] as const;
 
 export interface UseSearchAccountsResult {
@@ -35,7 +38,8 @@ export function useSearchAccounts(searchTerm: string, delay = 350): UseSearchAcc
     debouncedTerm,
     isDebouncing,
     isSearching: (query.isLoading || query.isFetching) && debouncedTerm.length > 0,
-    searchResults: query.data ?? [],
+    searchResults: debouncedTerm.length > 0 ? (query.data ?? EMPTY_RESULTS) : EMPTY_RESULTS,
     error: query.error,
   };
 }
+

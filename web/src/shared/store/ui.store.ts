@@ -47,7 +47,14 @@ export const useUiStore = create<UiState>((set) => ({
       searchTerm,
       matchedCodes: searchTerm.trim() === '' ? [] : state.matchedCodes,
     })),
-  setMatchedCodes: (matchedCodes) => set({ matchedCodes }),
+  setMatchedCodes: (matchedCodes) =>
+    set((state) => {
+      const isSame =
+        state.matchedCodes.length === matchedCodes.length &&
+        state.matchedCodes.every((code, i) => code === matchedCodes[i]);
+      // Retornar el mismo estado evita notificaciones y re-renders innecesarios
+      return isSame ? state : { matchedCodes };
+    }),
   setSelectedAccount: (selectedAccount) => set({ selectedAccount }),
   openCreateModal: (prefillParentCode = '', prefillParentName = '') =>
     set({

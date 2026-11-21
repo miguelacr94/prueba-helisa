@@ -42,3 +42,4 @@ describe('FindAllAccountsUseCase', () => {
     expect(results).toHaveLength(0);
   });
 });
+
