@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  type Relation,
 } from 'typeorm';
 import { AccountingMovementOrmEntity } from './accounting-movement.orm-entity.js';
 
@@ -47,20 +48,20 @@ export class AccountOrmEntity {
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'parent_code', referencedColumnName: 'code' })
-  parent?: AccountOrmEntity | null;
+  parent?: Relation<AccountOrmEntity> | null;
 
   /**
    * Relación Autorreferencial Uno a Muchos (1:N):
    * Una cuenta padre puede tener múltiples cuentas hijas.
    */
   @OneToMany(() => AccountOrmEntity, (child) => child.parent)
-  children?: AccountOrmEntity[];
+  children?: Relation<AccountOrmEntity>[];
 
   /**
    * Relación Uno a Muchos (1:N) con Movimientos Contables:
    * Solo las cuentas hoja registran movimientos.
    */
   @OneToMany(() => AccountingMovementOrmEntity, (movement) => movement.account)
-  movements?: AccountingMovementOrmEntity[];
+  movements?: Relation<AccountingMovementOrmEntity>[];
 }
 

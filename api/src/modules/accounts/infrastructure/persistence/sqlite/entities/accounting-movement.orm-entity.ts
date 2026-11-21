@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  type Relation,
 } from 'typeorm';
 import { AccountOrmEntity } from './account.orm-entity.js';
 
@@ -41,6 +42,6 @@ export class AccountingMovementOrmEntity {
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'account_code', referencedColumnName: 'code' })
-  account?: AccountOrmEntity;
+  account?: Relation<AccountOrmEntity>;
 }
 
