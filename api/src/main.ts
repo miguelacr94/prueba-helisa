@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { existsSync } from 'node:fs';
 import { AppModule } from './app.module.js';
+import { validateEnv } from './config/env.schema.js';
 import { GatewayExceptionFilter } from './gateway/filters/gateway-exception.filter.js';
 import { TransformResponseInterceptor } from './gateway/interceptors/transform-response.interceptor.js';
 
@@ -15,10 +16,13 @@ if (typeof process.loadEnvFile === 'function') {
   }
 }
 
+// Validar variables de entorno con Zod antes de inicializar la app
+const env = validateEnv(process.env);
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const rawCors = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+  const rawCors = env.CORS_ORIGIN;
   const corsOrigins = rawCors.includes(',')
     ? rawCors.split(',').map((o) => o.trim())
     : rawCors;
@@ -28,8 +32,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const globalPrefix = process.env.GLOBAL_PREFIX ?? 'api/v1';
-  const swaggerPath = process.env.SWAGGER_PATH ?? 'docs';
+  const globalPrefix = env.GLOBAL_PREFIX;
+  const swaggerPath = env.SWAGGER_PATH;
 
   // Prefijo global para todas las rutas del API Gateway
   app.setGlobalPrefix(globalPrefix, {
@@ -65,10 +69,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup(swaggerPath, app, document);
 
-  const port = Number(process.env.PORT) || 3000;
-  const host = process.env.HOST ?? '0.0.0.0';
-
-  await app.listen(port, host);
+  await app.listen(env.PORT, env.HOST);
 }
 
 await bootstrap();

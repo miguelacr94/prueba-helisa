@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, PlusCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { useUiStore } from '../store/ui.store';
+import { env } from '../config/env.config';
 
 interface NavbarProps {
   onRefresh?: () => void;
@@ -9,7 +10,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onRefresh, isFetching }) => {
   const openCreateModal = useUiStore((state) => state.openCreateModal);
-  const swaggerUrl = `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/docs`;
+  const swaggerUrl = `${env.VITE_API_URL}/docs`;
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">

@@ -1,4 +1,5 @@
 import type { ApiErrorResponse, ApiSuccessResponse } from './api-types';
+import { env } from '../config/env.config';
 
 export class ApiException extends Error {
   public readonly code: string;
@@ -23,10 +24,8 @@ export class HttpClient {
   private readonly apiPrefix: string;
 
   constructor() {
-    const rawBase = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-    this.baseUrl = rawBase.replace(/\/$/, '');
-    const rawPrefix = import.meta.env.VITE_API_PREFIX ?? '/api/v1';
-    this.apiPrefix = rawPrefix.startsWith('/') ? rawPrefix : `/${rawPrefix}`;
+    this.baseUrl = env.VITE_API_URL.replace(/\/$/, '');
+    this.apiPrefix = env.VITE_API_PREFIX.startsWith('/') ? env.VITE_API_PREFIX : `/${env.VITE_API_PREFIX}`;
   }
 
   private buildUrl(path: string, params?: Record<string, string | number | boolean | undefined>): string {
