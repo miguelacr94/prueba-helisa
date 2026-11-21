@@ -18,7 +18,7 @@ export interface ApiErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
     timestamp: string;
     path: string;
   };
@@ -41,7 +41,7 @@ export class GatewayExceptionFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorCode = 'INTERNAL_SERVER_ERROR';
     let message = 'Ha ocurrido un error inesperado en el servidor.';
-    let details: any = null;
+    let details: unknown = null;
 
     if (exception instanceof DomainException) {
       if (exception instanceof AccountAlreadyExistsException) {
@@ -60,13 +60,22 @@ export class GatewayExceptionFilter implements ExceptionFilter {
       const res = exception.getResponse();
 
       if (typeof res === 'object' && res !== null) {
-        const body = res as Record<string, any>;
-        message = body['message'] ?? exception.message;
-        errorCode = (body['error'] ?? 'HTTP_ERROR').toUpperCase().replace(/\s+/g, '_');
-        details = Array.isArray(body['message']) ? body['message'] : null;
-        if (details) {
+        const body = res as Record<string, unknown>;
+        const rawMessage = body['message'];
+        if (Array.isArray(rawMessage)) {
           message = 'Error de validación en los datos de entrada.';
+          details = rawMessage;
+        } else if (typeof rawMessage === 'string') {
+          message = rawMessage;
+        } else {
+          message = exception.message;
         }
+
+        const rawError = body['error'];
+        errorCode =
+          typeof rawError === 'string'
+            ? rawError.toUpperCase().replace(/\s+/g, '_')
+            : 'HTTP_ERROR';
       } else {
         message = exception.message;
         errorCode = 'HTTP_EXCEPTION';

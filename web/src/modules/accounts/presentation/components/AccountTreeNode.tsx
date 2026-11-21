@@ -4,6 +4,7 @@ import {
   ChevronDown,
   Plus,
   Trash2,
+  Edit2,
   FolderTree,
   FileSpreadsheet,
 } from 'lucide-react';
@@ -24,6 +25,7 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
     expandedNodes,
     toggleNode,
     openCreateModal,
+    openRenameModal,
     openDeleteDialog,
     searchTerm,
   } = useUiStore();
@@ -44,12 +46,12 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
   return (
     <div className="select-none transition-colors">
       <div
-        className={`group flex items-center justify-between py-2 px-3 rounded-xl border transition-all ${
+        className={`group flex flex-wrap sm:flex-nowrap items-center justify-between py-2 px-3 rounded-xl border transition-all ${
           isSearchMatch
             ? 'bg-amber-50/80 border-amber-300 ring-2 ring-amber-100'
             : 'bg-white hover:bg-slate-50/80 border-slate-200/80 hover:border-slate-300'
-        } mb-1.5 shadow-2xs`}
-        style={{ marginLeft: `${depth * 24}px` }}
+        } mb-1.5 shadow-2xs gap-2`}
+        style={{ marginLeft: `${depth * 20}px` }}
       >
         {/* Lado izquierdo: Chevron, Código, Nombre, Nivel */}
         <div className="flex items-center space-x-2.5 min-w-0 flex-1">
@@ -90,33 +92,33 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
             <span className="font-mono font-bold text-sm text-slate-900 tracking-tight">
               {node.code}
             </span>
-            <span className="text-sm font-semibold text-slate-700 truncate">
+            <span className="text-sm font-semibold text-slate-700 truncate" title={node.name}>
               {node.name}
             </span>
           </div>
 
           {/* Badge de Nivel */}
           <span
-            className={`hidden sm:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-md border ${levelInfo.badgeClass}`}
+            className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${levelInfo.badgeClass}`}
           >
             {node.level}
           </span>
         </div>
 
         {/* Lado derecho: Naturaleza, Movimientos, Acciones */}
-        <div className="flex items-center space-x-2 shrink-0 ml-3">
+        <div className="flex items-center space-x-2 shrink-0 ml-auto sm:ml-3">
           {/* Badge Naturaleza */}
-          <Badge variant={isNatureDebit ? 'info' : 'purple'}>
+          <Badge variant={isNatureDebit ? 'info' : 'purple'} className="font-bold text-[10px]">
             {isNatureDebit ? 'DÉBITO' : 'CRÉDITO'}
           </Badge>
 
           {/* Badge Movimientos */}
           {node.acceptsMovements ? (
-            <Badge variant="success" className="hidden md:inline-flex">
+            <Badge variant="success" className="hidden md:inline-flex text-[10px]">
               Admite Movimientos
             </Badge>
           ) : (
-            <Badge variant="warning" className="hidden md:inline-flex">
+            <Badge variant="warning" className="hidden md:inline-flex text-[10px]">
               Con Hijas
             </Badge>
           )}
@@ -125,14 +127,22 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
           <div className="flex items-center space-x-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
             {canHaveChildren && (
               <button
-                onClick={() => openCreateModal(node.code)}
-                title={`Crear cuenta hija dependiente de ${node.code}`}
+                onClick={() => openCreateModal(node.code, node.name)}
+                title={`Crear cuenta hija dependiente de ${node.code} (${node.name})`}
                 className="inline-flex items-center space-x-1 px-2 py-1 text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden lg:inline">Hija</span>
               </button>
             )}
+
+            <button
+              onClick={() => openRenameModal(node)}
+              title={`Renombrar cuenta ${node.code}`}
+              className="p-1.5 rounded-md transition-colors cursor-pointer text-slate-500 hover:text-indigo-600 hover:bg-indigo-50"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+            </button>
 
             <button
               onClick={() => openDeleteDialog(node)}
@@ -143,7 +153,7 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
               }
               className="p-1.5 rounded-md transition-colors cursor-pointer text-rose-500 hover:text-rose-700 hover:bg-rose-50"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -152,7 +162,7 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
       {/* Renderizado recursivo de hijos */}
       {hasChildren && isExpanded && (
         <div className="relative">
-          <div className="absolute left-[11px] top-0 bottom-2 w-px bg-slate-200/80 -z-10" />
+          <div className="absolute left-[9px] top-0 bottom-2 w-px bg-slate-200/80 -z-10" />
           {node.children.map((child) => (
             <AccountTreeNode key={child.code} node={child} depth={depth + 1} />
           ))}

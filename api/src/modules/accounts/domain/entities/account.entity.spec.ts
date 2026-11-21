@@ -53,7 +53,7 @@ describe('Account Entity (Domain Invariants)', () => {
 
     it('debe rechazar una naturaleza contable inexistente', () => {
       expect(() =>
-        Account.create({ code: '1', name: 'Caja', nature: 'OTRA' as any }),
+        Account.create({ code: '1', name: 'Caja', nature: 'OTRA' as unknown as AccountNature }),
       ).toThrow(InvalidAccountNatureException);
     });
   });

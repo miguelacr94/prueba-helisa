@@ -61,3 +61,4 @@ describe('RenameAccountUseCase', () => {
     ).rejects.toThrow(InvalidAccountNameException);
   });
 });
+

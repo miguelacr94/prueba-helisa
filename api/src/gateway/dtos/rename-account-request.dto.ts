@@ -10,3 +10,4 @@ export class RenameAccountRequestDto {
   @IsNotEmpty({ message: 'El nombre es obligatorio y no puede estar vacío.' })
   name!: string;
 }
+
