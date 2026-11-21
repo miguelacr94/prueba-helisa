@@ -13,8 +13,14 @@ export class AccountHttpRepository implements IAccountRepository {
     return this.client.get<AccountTreeNode[]>('/accounts/tree');
   }
 
-  async getAll(): Promise<Account[]> {
-    return this.client.get<Account[]>('/accounts');
+  async getAll(search?: string): Promise<Account[]> {
+    return this.client.get<Account[]>('/accounts', {
+      params: search ? { search } : undefined,
+    });
+  }
+
+  async search(query: string): Promise<Account[]> {
+    return this.getAll(query);
   }
 
   async getByCode(code: string): Promise<Account> {

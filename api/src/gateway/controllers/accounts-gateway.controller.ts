@@ -8,11 +8,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiUnprocessableEntityResponse,
@@ -75,12 +77,19 @@ export class AccountsGatewayController {
 
   @Get()
   @ApiOperation({
-    summary: 'Listar todas las cuentas contables (plano)',
-    description: 'Retorna un listado plano de todas las cuentas ordenadas ascendentemente por código.',
+    summary: 'Listar o buscar cuentas contables (plano)',
+    description:
+      'Retorna un listado plano de todas las cuentas ordenadas ascendentemente por código. Admite filtro de búsqueda por código o nombre mediante el query param "search".',
   })
-  @ApiResponse({ status: 200, description: 'Listado plano de cuentas.' })
-  async findAll() {
-    return this.findAllAccountsUseCase.execute();
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Término de búsqueda para filtrar cuentas por código o nombre',
+    example: '1105',
+  })
+  @ApiResponse({ status: 200, description: 'Listado plano de cuentas filtradas o completas.' })
+  async findAll(@Query('search') search?: string) {
+    return this.findAllAccountsUseCase.execute(search);
   }
 
   @Get(':code')

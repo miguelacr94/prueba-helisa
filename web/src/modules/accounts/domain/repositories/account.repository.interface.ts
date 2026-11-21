@@ -2,7 +2,8 @@ import type { Account, AccountTreeNode, CreateAccountInput } from '../models/acc
 
 export interface IAccountRepository {
   getTree(): Promise<AccountTreeNode[]>;
-  getAll(): Promise<Account[]>;
+  getAll(search?: string): Promise<Account[]>;
+  search(query: string): Promise<Account[]>;
   getByCode(code: string): Promise<Account>;
   create(payload: CreateAccountInput): Promise<Account>;
   rename(code: string, newName: string): Promise<Account>;

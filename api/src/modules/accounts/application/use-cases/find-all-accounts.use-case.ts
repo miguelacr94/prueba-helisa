@@ -10,8 +10,18 @@ export class FindAllAccountsUseCase {
     private readonly repository: AccountRepositoryPort,
   ) {}
 
-  async execute(): Promise<AccountOutputDto[]> {
+  async execute(search?: string): Promise<AccountOutputDto[]> {
     const accounts = await this.repository.findAll();
-    return accounts.map(toAccountOutputDto);
+    const query = search?.trim().toLowerCase();
+
+    const filtered = query
+      ? accounts.filter(
+          (acc) =>
+            acc.code.toLowerCase().includes(query) ||
+            acc.name.toLowerCase().includes(query),
+        )
+      : accounts;
+
+    return filtered.map(toAccountOutputDto);
   }
 }

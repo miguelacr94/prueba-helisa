@@ -6,29 +6,72 @@ import {
   Sparkles,
   BookOpen,
   Filter,
+  Loader2,
 } from 'lucide-react';
 import type { AccountTreeNode as IAccountTreeNode } from '../../domain/models/account.model';
 import { AccountTreeNode } from './AccountTreeNode';
 import { useUiStore } from '../../../../shared/store/ui.store';
 import { useCreateAccount } from '../../application/hooks/use-create-account.hook';
+import { useSearchAccounts } from '../../application/hooks/use-search-accounts.hook';
 
 interface AccountTreeProps {
   tree: IAccountTreeNode[];
   isLoading: boolean;
 }
 
+/**
+ * Obtiene los códigos ancestros de una cuenta según los niveles del PUC colombiano:
+ * Clase (1) -> Grupo (2) -> Cuenta (4) -> Subcuenta (6)
+ */
+function getAncestorCodes(code: string): string[] {
+  const ancestors: string[] = [];
+  if (code.length === 6) {
+    ancestors.push(code.substring(0, 1), code.substring(0, 2), code.substring(0, 4));
+  } else if (code.length === 4) {
+    ancestors.push(code.substring(0, 1), code.substring(0, 2));
+  } else if (code.length === 2) {
+    ancestors.push(code.substring(0, 1));
+  }
+  return ancestors;
+}
+
 export const AccountTree: React.FC<AccountTreeProps> = ({ tree, isLoading }) => {
   const {
     searchTerm,
     setSearchTerm,
+    setMatchedCodes,
     expandAll,
     collapseAll,
     openCreateModal,
     expandBranches,
   } = useUiStore();
+
   const createMutation = useCreateAccount();
 
-  // Abrir automáticamente las ramas donde hay coincidencia de búsqueda por código o nombre
+  // Búsqueda con debounce vía API
+  const { debouncedTerm, isDebouncing, isSearching, searchResults } = useSearchAccounts(searchTerm);
+
+  // Sincronizar coincidencias devueltas por la API y autoexpandir sus ramas
+  useEffect(() => {
+    if (!debouncedTerm) {
+      setMatchedCodes([]);
+      return;
+    }
+
+    const matched = searchResults.map((acc) => acc.code);
+    setMatchedCodes(matched);
+
+    if (matched.length > 0) {
+      const ancestorsToExpand = Array.from(
+        new Set(searchResults.flatMap((acc) => getAncestorCodes(acc.code))),
+      );
+      if (ancestorsToExpand.length > 0) {
+        expandBranches(ancestorsToExpand);
+      }
+    }
+  }, [debouncedTerm, searchResults, setMatchedCodes, expandBranches]);
+
+  // Recorrido local complementario para feedback instantáneo mientras se tipea
   useEffect(() => {
     const term = searchTerm.trim().toLowerCase();
     if (!term || tree.length === 0) return;
@@ -132,11 +175,15 @@ export const AccountTree: React.FC<AccountTreeProps> = ({ tree, isLoading }) => 
 
   return (
     <div className="space-y-4">
-      {/* Barra de Búsqueda y Filtros Responsiva */}
+      {/* Barra de Búsqueda y Filtros Responsiva con Debounce y Consulta API */}
       <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-4 shadow-xs">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            {isSearching || isDebouncing ? (
+              <Loader2 className="w-4 h-4 text-indigo-600 animate-spin absolute left-3.5 top-1/2 -translate-y-1/2" />
+            ) : (
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            )}
             <input
               type="text"
               value={searchTerm}
@@ -172,6 +219,33 @@ export const AccountTree: React.FC<AccountTreeProps> = ({ tree, isLoading }) => 
             </button>
           </div>
         </div>
+
+        {/* Indicador de Estado de Búsqueda API & Debounce */}
+        {searchTerm.trim() !== '' && (
+          <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-2">
+              {isDebouncing ? (
+                <span className="inline-flex items-center text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-medium border border-amber-200/80">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse mr-1.5" />
+                  Escribiendo (debounce 350ms)...
+                </span>
+              ) : isSearching ? (
+                <span className="inline-flex items-center text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md font-medium border border-indigo-200/80">
+                  <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                  Consultando API (/api/v1/accounts?search=...)...
+                </span>
+              ) : searchResults.length > 0 ? (
+                <span className="inline-flex items-center text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-medium border border-emerald-200/80">
+                  ✓ {searchResults.length} {searchResults.length === 1 ? 'cuenta encontrada' : 'cuentas encontradas'} vía API
+                </span>
+              ) : (
+                <span className="inline-flex items-center text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md font-medium border border-slate-200">
+                  Sin coincidencias en la API para &quot;{debouncedTerm}&quot;
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Resumen de estadísticas Adaptativo */}
         {tree.length > 0 && (

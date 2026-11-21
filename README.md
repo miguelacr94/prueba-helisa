@@ -15,10 +15,12 @@ Repositorio oficial: [https://github.com/miguelacr94/prueba-helisa](https://gith
 ## 1. Cómo correr el proyecto
 
 ### Requisitos previos
+
 - **Node.js**: Versión 22 (recomendado con `nvm use`).
 - **npm**: Versión 10 o superior (`npm -v`).
 
 ### Puesta en marcha rápida (Full-Stack)
+
 Desde la raíz del repositorio:
 
 ```bash
@@ -34,6 +36,7 @@ npm run dev
 ```
 
 Una vez ejecutado:
+
 - **Frontend Web**: [http://localhost:5173](http://localhost:5173) (o el puerto configurado en `VITE_PORT`)
 - **Backend API**: [http://localhost:3000](http://localhost:3000) (o el puerto configurado en `PORT`)
 - **Documentación Swagger / OpenAPI**: [http://localhost:3000/docs](http://localhost:3000/docs) (o la ruta en `SWAGGER_PATH`)
@@ -43,23 +46,25 @@ Una vez ejecutado:
 Tanto el backend como el frontend están completamente parametrizados mediante variables de entorno, **sin puertos, hosts, rutas de base de datos ni URLs de API harcodeados**. Cada subproyecto cuenta con su propia plantilla `.env.example`, y en la raíz del repositorio se dispone de una plantilla unificada.
 
 #### 1. Backend (`api/.env` / `api/.env.example`)
-| Variable | Tipo | Descripción | Valor por Defecto | Ejemplo / Uso |
-| :--- | :---: | :--- | :--- | :--- |
-| `PORT` | `number` | Puerto HTTP donde el servidor NestJS escucha peticiones | `3000` | `PORT=4000` |
-| `HOST` | `string` | Dirección IP o interfaz de red para el binding del servidor | `0.0.0.0` | `HOST=127.0.0.1` |
-| `NODE_ENV` | `string` | Entorno de ejecución (`development`, `production`, `test`) | `development` | `NODE_ENV=production` |
-| `GLOBAL_PREFIX` | `string` | Prefijo global del API Gateway para todas las rutas REST | `api/v1` | `GLOBAL_PREFIX=api/v2` |
-| `SWAGGER_PATH` | `string` | Ruta relativa para acceder a la documentación interactiva OpenAPI | `docs` | `SWAGGER_PATH=swagger` |
-| `CORS_ORIGIN` | `string` | Orígenes web autorizados para CORS (admite listas separadas por coma) | `http://localhost:5173` | `CORS_ORIGIN=http://localhost:5173,https://midominio.com` |
-| `DATABASE_PATH` | `string` | Ruta del archivo de base de datos SQLite relacional (`:memory:` para RAM) | `puc.sqlite` | `DATABASE_PATH=data/puc_prod.sqlite` |
+
+| Variable        |   Tipo   | Descripción                                                               | Valor por Defecto       | Ejemplo / Uso                                             |
+| :-------------- | :------: | :------------------------------------------------------------------------ | :---------------------- | :-------------------------------------------------------- |
+| `PORT`          | `number` | Puerto HTTP donde el servidor NestJS escucha peticiones                   | `3000`                  | `PORT=4000`                                               |
+| `HOST`          | `string` | Dirección IP o interfaz de red para el binding del servidor               | `0.0.0.0`               | `HOST=127.0.0.1`                                          |
+| `NODE_ENV`      | `string` | Entorno de ejecución (`development`, `production`, `test`)                | `development`           | `NODE_ENV=production`                                     |
+| `GLOBAL_PREFIX` | `string` | Prefijo global del API Gateway para todas las rutas REST                  | `api/v1`                | `GLOBAL_PREFIX=api/v2`                                    |
+| `SWAGGER_PATH`  | `string` | Ruta relativa para acceder a la documentación interactiva OpenAPI         | `docs`                  | `SWAGGER_PATH=swagger`                                    |
+| `CORS_ORIGIN`   | `string` | Orígenes web autorizados para CORS (admite listas separadas por coma)     | `http://localhost:5173` | `CORS_ORIGIN=http://localhost:5173,https://midominio.com` |
+| `DATABASE_PATH` | `string` | Ruta del archivo de base de datos SQLite relacional (`:memory:` para RAM) | `puc.sqlite`            | `DATABASE_PATH=data/puc_prod.sqlite`                      |
 
 #### 2. Frontend (`web/.env` / `web/.env.example`)
-| Variable | Tipo | Descripción | Valor por Defecto | Ejemplo / Uso |
-| :--- | :---: | :--- | :--- | :--- |
-| `VITE_PORT` | `number` | Puerto local en el que se levanta el servidor de desarrollo de Vite | `5173` | `VITE_PORT=8080` |
-| `VITE_HOST` | `string` | Host para el servidor de desarrollo de Vite | `localhost` | `VITE_HOST=0.0.0.0` |
-| `VITE_API_URL` | `string` | URL base del servidor backend (API Gateway) | `http://localhost:3000` | `VITE_API_URL=http://localhost:4000` |
-| `VITE_API_PREFIX` | `string` | Prefijo global consumido por el cliente HTTP (`HttpClient`) | `/api/v1` | `VITE_API_PREFIX=/api/v1` |
+
+| Variable          |   Tipo   | Descripción                                                         | Valor por Defecto       | Ejemplo / Uso                        |
+| :---------------- | :------: | :------------------------------------------------------------------ | :---------------------- | :----------------------------------- |
+| `VITE_PORT`       | `number` | Puerto local en el que se levanta el servidor de desarrollo de Vite | `5173`                  | `VITE_PORT=8080`                     |
+| `VITE_HOST`       | `string` | Host para el servidor de desarrollo de Vite                         | `localhost`             | `VITE_HOST=0.0.0.0`                  |
+| `VITE_API_URL`    | `string` | URL base del servidor backend (API Gateway)                         | `http://localhost:3000` | `VITE_API_URL=http://localhost:4000` |
+| `VITE_API_PREFIX` | `string` | Prefijo global consumido por el cliente HTTP (`HttpClient`)         | `/api/v1`               | `VITE_API_PREFIX=/api/v1`            |
 
 #### Escenarios de Configuración Comunes
 
@@ -74,15 +79,15 @@ Tanto el backend como el frontend están completamente parametrizados mediante v
 
 ### Scripts disponibles
 
-| Script | Descripción |
-| :--- | :--- |
-| `npm run dev` | Levanta API (`:3000`) y Web (`:5173`) en simultáneo con recarga en caliente |
-| `npm run dev:api` | Levanta únicamente el backend en NestJS |
-| `npm run dev:web` | Levanta únicamente el frontend en React + Vite |
-| `npm run build` | Compila ambos proyectos (`nest build` y `vite build`) |
-| `npm test` | Ejecuta las pruebas unitarias del backend con Vitest (26 pruebas en 8 suites) |
-| `npm run test:e2e --prefix api` | Ejecuta las pruebas de integración E2E del API Gateway |
-| `npm run lint` | Ejecuta el análisis estático de código con Oxlint en ambos proyectos (0 advertencias, 0 errores) |
+| Script                          | Descripción                                                                                      |
+| :------------------------------ | :----------------------------------------------------------------------------------------------- |
+| `npm run dev`                   | Levanta API (`:3000`) y Web (`:5173`) en simultáneo con recarga en caliente                      |
+| `npm run dev:api`               | Levanta únicamente el backend en NestJS                                                          |
+| `npm run dev:web`               | Levanta únicamente el frontend en React + Vite                                                   |
+| `npm run build`                 | Compila ambos proyectos (`nest build` y `vite build`)                                            |
+| `npm test`                      | Ejecuta las pruebas unitarias del backend con Vitest (34 pruebas en 10 suites)                    |
+| `npm run test:e2e --prefix api` | Ejecuta las pruebas de integración E2E del API Gateway                                           |
+| `npm run lint`                  | Ejecuta el análisis estático de código con Oxlint en ambos proyectos (0 advertencias, 0 errores) |
 
 ---
 
@@ -125,7 +130,7 @@ Tanto el backend como el frontend están completamente parametrizados mediante v
        - Cada movimiento contable (asiento con débito y crédito) pertenece estrictamente a una cuenta.
      - **Integridad Referencial**:
        - La base de datos rechaza automáticamente a nivel de motor la eliminación de cuentas que tengan hijas o que registren movimientos asociados.
-       - La regla de dominio del PUC *"Solo las cuentas sin hijas admiten movimientos contables"* valida que una cuenta no tenga descendientes antes de registrar un movimiento.
+       - La regla de dominio del PUC _"Solo las cuentas sin hijas admiten movimientos contables"_ valida que una cuenta no tenga descendientes antes de registrar un movimiento.
    - **Desacoplamiento Total (Puertos y Adaptadores)**:
      - Los casos de uso dependen únicamente de las abstracciones `AccountRepositoryPort` y `AccountingMovementRepositoryPort`.
      - `SqliteAccountRepository` y `SqliteMovementRepository` actúan como adaptadores de infraestructura sin contaminar el dominio contable.
@@ -156,8 +161,15 @@ Tanto el backend como el frontend están completamente parametrizados mediante v
 5. **Gestión de Estado de Interfaz con Zustand**:
    - `ui.store.ts` maneja el estado local del cliente: filtros de búsqueda en vivo, modales de creación/eliminación y nodos del árbol expandidos/colapsados.
 
-6. **Diseño y UX con Tailwind CSS**:
+6. **Búsqueda con Debounce Reactivo y Consulta Vía API**:
+   - Hook `useDebounce` (350ms por defecto) y `useSearchAccounts` integrados con TanStack Query.
+   - Consume en tiempo real el endpoint `GET /api/v1/accounts?search=...`, reduciendo la carga de red y evitando peticiones redundantes.
+   - Cálculo automático de ancestros del PUC (Clase $\rightarrow$ Grupo $\rightarrow$ Cuenta $\rightarrow$ Subcuenta) para auto-expandir las ramas donde se ubican las cuentas coincidentes.
+   - Retroalimentación de interfaz en vivo: indicador de tipeo con debounce, animación de carga con spinner durante la consulta a la API y pill de resumen con el conteo de cuentas encontradas.
+
+7. **Diseño y UX Responsivo Adaptativo para Móviles**:
    - Visualización jerárquica con sangría progresiva, badges de Débito/Crédito y etiquetas de cuentas de movimiento.
+   - Barra de búsqueda y controles de expansión 100% responsivos adaptables a cualquier resolución de pantalla (móvil, tablet y desktop).
    - Botón directo `+ Hija` en cada nodo para prellenar el prefijo del padre.
    - Diálogo de confirmación de eliminación con renderizado visible del mensaje de rechazo de la API si la cuenta contiene hijas.
    - Botón de **"Cargar PUC de Ejemplo"** cuando el catálogo está vacío para facilitar pruebas rápidas.
@@ -168,7 +180,7 @@ Tanto el backend como el frontend están completamente parametrizados mediante v
 
 - **Motor de persistencia relacional físico (PostgreSQL / MySQL)**: Se priorizó un repositorio en memoria para garantizar que el evaluador no tuviera que levantar Docker ni configurar credenciales de bases de datos.
 - **Autenticación y Control de Acceso (JWT / RBAC)**: No se incluyó login de usuarios ni permisos por rol (ej. solo el contador puede eliminar cuentas), ya que excedía el núcleo de la prueba técnica.
-- **Paginación y Virtualización en Servidor**: El catálogo se consulta en memoria y se envía completo como árbol recursivo. Para catálogos corporativos con más de 100.000 cuentas se requeriría carga perezosa (*lazy loading* / paginación por ramas).
+- **Paginación y Virtualización en Servidor**: El catálogo se consulta en memoria y se envía completo como árbol recursivo. Para catálogos corporativos con más de 100.000 cuentas se requeriría carga perezosa (_lazy loading_ / paginación por ramas).
 - **Módulo de Asientos Contables**: Se implementó la regla de negocio `acceptsMovements = !hasChildren`, pero no se construyó la interfaz para registrar débitos y créditos con partida doble.
 
 ---
@@ -185,3 +197,21 @@ Tanto el backend como el frontend están completamente parametrizados mediante v
    - Generación de reportes del Catálogo de Cuentas y Balance de Comprobación en formatos Excel (XLSX) y PDF estructurado.
 5. **Pruebas de Componentes Frontend**:
    - Agregar pruebas unitarias con Vitest + Testing Library para los componentes de React (`AccountTree`, `AccountFormModal`).
+
+La razon de implementar este tipo de arquitectura es con el fin de poner implementar patrones y principios de arquitectura limpia y solid en una aplicacion web adicional que al mantener estos princios podemos realizar una separacion entre la logica del negocio y la tecnologia, en caso tal que en un futuro se quisiera cambiar el motor de persistencia, se podria hacer sin afectar la logica de negocio.
+
+1. **Arquitectura Hexagonal / Portales y Adaptadores**:
+   - **Por qué**: Permite aislar la lógica de negocio (Use Cases) de la infraestructura (Repositorios, Controladores).
+   - **Beneficio**: El código de negocio no conoce si está leyendo de una base de datos SQL, un archivo JSON o una API externa. Esto facilita enormemente el testing y el mantenimiento.
+
+2. **Clean Code & SOLID**:
+   - **Por qué**: Principios como la Responsabilidad Única (SRP) y la Inversión de Dependencias (DIP) son la base de esta arquitectura.
+   - **Beneficio**: Código predecible, fácil de depurar y escalable. No hay funciones monolíticas "Dios" y las dependencias fluyen en una sola dirección.
+
+3. **Domain-Driven Design (DDD)**:
+   - **Por qué**: El sistema está centrado en el "Dominio" (el Plan Único de Cuentas). Las entidades (`Account`) y reglas (`parent_code` no puede ser igual al `code`) tienen alta prioridad.
+   - **Beneficio**: Refleja fielmente las reglas del negocio contable, haciéndolo más fácil de entender para los contadores y auditores.
+
+4. **API Gateway / Facade Layer**:
+   - **Por qué**: En lugar de conectar el frontend directamente con los servicios internos, se interpone una capa "Puerta de Enlace".
+   - **Beneficio**: Centraliza la seguridad (autenticación), estandariza las respuestas (envuelve todo en `{success, data, error}`) y oculta la complejidad interna. Si mañana decides cambiar NestJS por otro framework, solo actualizas el Gateway sin romper la web.

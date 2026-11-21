@@ -28,6 +28,7 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
     openRenameModal,
     openDeleteDialog,
     searchTerm,
+    matchedCodes,
   } = useUiStore();
 
   const isExpanded = expandedNodes[node.code] ?? true;
@@ -37,11 +38,13 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
   const levelInfo = getLevelBadgeStyle(node.level);
   const isNatureDebit = node.nature === 'DEBITO';
 
-  // Highlight search
+  // Highlight search: coincide vía API (matchedCodes) o filtro reactivo preventivo
+  const cleanSearch = searchTerm.trim().toLowerCase();
   const isSearchMatch =
-    searchTerm.trim() !== '' &&
-    (node.code.includes(searchTerm.trim()) ||
-      node.name.toLowerCase().includes(searchTerm.trim().toLowerCase()));
+    cleanSearch !== '' &&
+    (matchedCodes.includes(node.code) ||
+      node.code.toLowerCase().includes(cleanSearch) ||
+      node.name.toLowerCase().includes(cleanSearch));
 
   return (
     <div className="select-none transition-colors">
