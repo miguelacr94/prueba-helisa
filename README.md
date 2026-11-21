@@ -1,6 +1,14 @@
 # Prueba Técnica Full-Stack: Catálogo de Cuentas Contables (PUC)
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-miguelacr94%2Fprueba--helisa-181717?style=flat&logo=github)](https://github.com/miguelacr94/prueba-helisa)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x%20%7C%206.x-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/Backend-NestJS%2012-E0234E?style=flat&logo=nestjs)](https://nestjs.com/)
+[![React](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB?style=flat&logo=react)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Styles-Tailwind%20v4-38B2AC?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
+
 Solución completa para la gestión jerárquica del Plan Único de Cuentas (PUC) desarrollada con **NestJS (Clean Architecture + API Gateway)** en el backend y **React + Vite + TypeScript (Repository Pattern + TanStack Query + Tailwind CSS)** en el frontend.
+
+Repositorio oficial: [https://github.com/miguelacr94/prueba-helisa](https://github.com/miguelacr94/prueba-helisa)
 
 ---
 
@@ -128,4 +136,3 @@ Una vez ejecutado:
    - Generación de reportes del Catálogo de Cuentas y Balance de Comprobación en formatos Excel (XLSX) y PDF estructurado.
 5. **Pruebas de Componentes Frontend**:
    - Agregar pruebas unitarias con Vitest + Testing Library para los componentes de React (`AccountTree`, `AccountFormModal`).
-# prueba-helisa
