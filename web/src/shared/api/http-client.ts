@@ -20,15 +20,21 @@ export interface HttpRequestOptions extends RequestInit {
 
 export class HttpClient {
   private readonly baseUrl: string;
+  private readonly apiPrefix: string;
 
   constructor() {
     const rawBase = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
     this.baseUrl = rawBase.replace(/\/$/, '');
+    const rawPrefix = import.meta.env.VITE_API_PREFIX ?? '/api/v1';
+    this.apiPrefix = rawPrefix.startsWith('/') ? rawPrefix : `/${rawPrefix}`;
   }
 
   private buildUrl(path: string, params?: Record<string, string | number | boolean | undefined>): string {
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    const fullPath = cleanPath.startsWith('/api/') ? cleanPath : `/api/v1${cleanPath}`;
+    const fullPath =
+      cleanPath.startsWith(this.apiPrefix) || cleanPath.startsWith('/api/')
+        ? cleanPath
+        : `${this.apiPrefix}${cleanPath}`;
     const url = new URL(`${this.baseUrl}${fullPath}`);
 
     if (params) {

@@ -25,14 +25,41 @@ Desde la raíz del repositorio:
 # 1. Instalar dependencias en raíz, api/ y web/
 npm install
 
-# 2. Levantar API y Frontend en paralelo (modo desarrollo)
+# 2. Configurar variables de entorno (opcional, ya existen valores por defecto preconfigurados)
+cp api/.env.example api/.env
+cp web/.env.example web/.env
+
+# 3. Levantar API y Frontend en paralelo (modo desarrollo)
 npm run dev
 ```
 
 Una vez ejecutado:
-- **Frontend Web**: [http://localhost:5173](http://localhost:5173)
-- **Backend API**: [http://localhost:3000](http://localhost:3000)
-- **Documentación Swagger / OpenAPI**: [http://localhost:3000/docs](http://localhost:3000/docs)
+- **Frontend Web**: [http://localhost:5173](http://localhost:5173) (o el puerto configurado en `VITE_PORT`)
+- **Backend API**: [http://localhost:3000](http://localhost:3000) (o el puerto configurado en `PORT`)
+- **Documentación Swagger / OpenAPI**: [http://localhost:3000/docs](http://localhost:3000/docs) (o la ruta en `SWAGGER_PATH`)
+
+### Variables de Entorno (`.env`)
+
+Tanto el backend como el frontend están completamente parametrizados mediante variables de entorno, sin puertos ni URLs de API harcodeados:
+
+#### Backend (`api/.env` / `api/.env.example`)
+| Variable | Descripción | Valor por Defecto |
+| :--- | :--- | :--- |
+| `PORT` | Puerto HTTP donde escucha el servidor NestJS | `3000` |
+| `HOST` | Dirección de red / host del servidor | `0.0.0.0` |
+| `NODE_ENV` | Entorno de ejecución (`development`, `production`, `test`) | `development` |
+| `GLOBAL_PREFIX` | Prefijo global del API Gateway | `api/v1` |
+| `SWAGGER_PATH` | Ruta de la documentación interactiva Swagger | `docs` |
+| `CORS_ORIGIN` | Orígenes permitidos (separados por coma para múltiples) | `http://localhost:5173` |
+| `DATABASE_PATH` | Ruta del archivo de base de datos relacional SQLite | `puc.sqlite` |
+
+#### Frontend (`web/.env` / `web/.env.example`)
+| Variable | Descripción | Valor por Defecto |
+| :--- | :--- | :--- |
+| `VITE_PORT` | Puerto del servidor de desarrollo de Vite | `5173` |
+| `VITE_HOST` | Host para el servidor de desarrollo | `localhost` |
+| `VITE_API_URL` | URL base del servidor backend (API Gateway) | `http://localhost:3000` |
+| `VITE_API_PREFIX` | Prefijo de las rutas de la API consumidas por el cliente | `/api/v1` |
 
 ### Scripts disponibles
 

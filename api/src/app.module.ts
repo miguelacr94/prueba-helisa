@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GatewayModule } from './gateway/gateway.module.js';
 import { AppController } from './app.controller.js';
@@ -8,6 +9,10 @@ import { AccountingMovementOrmEntity } from './modules/accounts/infrastructure/p
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env.local', '.env'],
+    }),
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database: process.env.DATABASE_PATH || 'puc.sqlite',
