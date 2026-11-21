@@ -34,31 +34,31 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-fade-in"
+        className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-fade-in"
         onClick={onClose}
       />
 
-      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+      <div className="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4 text-center">
         <div
-          className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidth} border border-slate-200`}
+          className={`relative transform overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidth} border border-slate-200 max-h-[92vh] flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+          <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-3 sm:pb-4 border-b border-slate-100 flex items-start justify-between shrink-0">
             <div>
-              <h3 className="text-lg font-bold text-slate-900 leading-tight">{title}</h3>
-              {subtitle && <p className="text-xs text-slate-500 mt-1">{subtitle}</p>}
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{title}</h3>
+              {subtitle && <p className="text-xs text-slate-500 mt-0.5 sm:mt-1">{subtitle}</p>}
             </div>
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+              className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Body */}
-          <div className="p-6">{children}</div>
+          {/* Body con scroll vertical en pantallas pequeñas */}
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1">{children}</div>
         </div>
       </div>
     </div>
