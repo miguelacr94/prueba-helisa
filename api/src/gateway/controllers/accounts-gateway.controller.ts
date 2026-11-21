@@ -19,12 +19,15 @@ import {
 } from '@nestjs/swagger';
 import { CreateAccountRequestDto } from '../dtos/create-account-request.dto.js';
 import { RenameAccountRequestDto } from '../dtos/rename-account-request.dto.js';
+import { RecordMovementRequestDto } from '../dtos/record-movement-request.dto.js';
 import { CreateAccountUseCase } from '../../modules/accounts/application/use-cases/create-account.use-case.js';
 import { FindAllAccountsUseCase } from '../../modules/accounts/application/use-cases/find-all-accounts.use-case.js';
 import { FindAccountByCodeUseCase } from '../../modules/accounts/application/use-cases/find-account-by-code.use-case.js';
 import { GetAccountTreeUseCase } from '../../modules/accounts/application/use-cases/get-account-tree.use-case.js';
 import { DeleteAccountUseCase } from '../../modules/accounts/application/use-cases/delete-account.use-case.js';
 import { RenameAccountUseCase } from '../../modules/accounts/application/use-cases/rename-account.use-case.js';
+import { RecordMovementUseCase } from '../../modules/accounts/application/use-cases/record-movement.use-case.js';
+import { FindMovementsByAccountUseCase } from '../../modules/accounts/application/use-cases/find-movements-by-account.use-case.js';
 
 @ApiTags('Cuentas Contables (PUC)')
 @Controller('accounts')
@@ -36,6 +39,8 @@ export class AccountsGatewayController {
     private readonly getAccountTreeUseCase: GetAccountTreeUseCase,
     private readonly deleteAccountUseCase: DeleteAccountUseCase,
     private readonly renameAccountUseCase: RenameAccountUseCase,
+    private readonly recordMovementUseCase: RecordMovementUseCase,
+    private readonly findMovementsByAccountUseCase: FindMovementsByAccountUseCase,
   ) {}
 
   @Post()
@@ -125,6 +130,41 @@ export class AccountsGatewayController {
     return {
       message: `Cuenta ${code} eliminada exitosamente.`,
     };
+  }
+
+  @Post(':code/movements')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Registrar un movimiento contable en una cuenta hoja',
+    description:
+      'Registra un movimiento contable (asiento con débito/crédito) asociado a una cuenta. Valida la regla de negocio del PUC: Solo las cuentas sin hijas admiten movimientos contables.',
+  })
+  @ApiParam({ name: 'code', description: 'Código de la cuenta contable hoja', example: '110505' })
+  @ApiResponse({ status: 201, description: 'Movimiento contable registrado con éxito.' })
+  @ApiResponse({ status: 400, description: 'La cuenta tiene hijas o los datos del movimiento son inválidos.' })
+  @ApiResponse({ status: 404, description: 'Cuenta no encontrada.' })
+  async recordMovement(
+    @Param('code') code: string,
+    @Body() dto: RecordMovementRequestDto,
+  ) {
+    return this.recordMovementUseCase.execute({
+      accountCode: code,
+      concept: dto.concept,
+      debit: dto.debit,
+      credit: dto.credit,
+    });
+  }
+
+  @Get(':code/movements')
+  @ApiOperation({
+    summary: 'Consultar movimientos contables de una cuenta',
+    description: 'Retorna el historial de movimientos o transacciones registradas en una cuenta contable.',
+  })
+  @ApiParam({ name: 'code', description: 'Código de la cuenta contable', example: '110505' })
+  @ApiResponse({ status: 200, description: 'Listado de movimientos de la cuenta.' })
+  @ApiResponse({ status: 404, description: 'Cuenta no encontrada.' })
+  async findMovements(@Param('code') code: string) {
+    return this.findMovementsByAccountUseCase.execute(code);
   }
 }
 

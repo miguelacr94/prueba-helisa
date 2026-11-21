@@ -52,3 +52,19 @@ export class AccountHasChildrenException extends DomainException {
   }
 }
 
+export class AccountDoesNotAcceptMovementsException extends DomainException {
+  public readonly code = 'ACCOUNT_DOES_NOT_ACCEPT_MOVEMENTS';
+
+  constructor(public readonly accountCode: string) {
+    super(`La cuenta ${accountCode} contiene cuentas hijas y no admite movimientos contables. Solo las cuentas sin hijas admiten movimientos.`);
+  }
+}
+
+export class AccountHasMovementsException extends DomainException {
+  public readonly code = 'ACCOUNT_HAS_MOVEMENTS';
+
+  constructor(public readonly accountCode: string) {
+    super(`No se puede eliminar la cuenta ${accountCode} porque registra movimientos contables asociados.`);
+  }
+}
+

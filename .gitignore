@@ -24,3 +24,10 @@ npm-debug.log*
 coverage
 .nyc_output
 temp
+
+# bases de datos locales
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-journal
+

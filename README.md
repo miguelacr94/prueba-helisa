@@ -76,13 +76,24 @@ Una vez ejecutado:
      ```
    - **Interceptor de Respuestas (`TransformResponseInterceptor`)**: Garantiza formato consistente en todas las peticiones exitosas: `{ success: true, data: ..., timestamp }`.
 
-3. **Desacoplamiento Total de la Persistencia (Puertos y Adaptadores)**:
-   - Se definió el contrato `AccountRepositoryPort` en el dominio y se inyecta mediante el token `ACCOUNT_REPOSITORY_TOKEN`.
-   - Se implementó `InMemoryAccountRepository` para garantizar **cero fricción en la evaluación**: el proyecto clona y corre de inmediato sin requerir configuración de Docker, bases de datos PostgreSQL o variables de entorno complejas.
-   - Cambiar a SQLite o PostgreSQL solo requiere implementar el puerto y cambiar una línea en `accounts.module.ts`.
+3. **Persistencia Relacional con SQLite y Relaciones entre Tablas**:
+   - Se configuró persistencia relacional con **SQLite** (`better-sqlite3` y TypeORM), asegurando atomicidad y cero configuración externa.
+   - **Modelado Relacional de Tablas con Claves Foráneas (`FOREIGN KEY`)**:
+     - **Tabla `accounts` (Autorreferencial 1:N)**:
+       - Columna `parent_code` con clave foránea referenciando a `accounts(code)` con `ON DELETE RESTRICT`.
+       - Una cuenta padre se relaciona con múltiples cuentas hijas (`children`), y cada hija pertenece a un único padre (`parent`).
+     - **Tabla `accounting_movements` (Relación 1:N)**:
+       - Columna `account_code` con clave foránea referenciando a `accounts(code)` con `ON DELETE RESTRICT`.
+       - Cada movimiento contable (asiento con débito y crédito) pertenece estrictamente a una cuenta.
+     - **Integridad Referencial**:
+       - La base de datos rechaza automáticamente a nivel de motor la eliminación de cuentas que tengan hijas o que registren movimientos asociados.
+       - La regla de dominio del PUC *"Solo las cuentas sin hijas admiten movimientos contables"* valida que una cuenta no tenga descendientes antes de registrar un movimiento.
+   - **Desacoplamiento Total (Puertos y Adaptadores)**:
+     - Los casos de uso dependen únicamente de las abstracciones `AccountRepositoryPort` y `AccountingMovementRepositoryPort`.
+     - `SqliteAccountRepository` y `SqliteMovementRepository` actúan como adaptadores de infraestructura sin contaminar el dominio contable.
 
 4. **Documentación Swagger / OpenAPI**:
-   - Integrada con `@nestjs/swagger` y disponible en `/docs`. Incluye descripciones de endpoints, esquemas de entrada/salida y códigos de estado.
+   - Integrada con `@nestjs/swagger` y disponible en `/docs`. Incluye descripciones de endpoints, esquemas de entrada/salida para cuentas y movimientos, y códigos de estado.
 
 ---
 

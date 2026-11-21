@@ -1,16 +1,28 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountsGatewayController } from './accounts-gateway.controller.js';
 import { AccountsModule } from '../../modules/accounts/accounts.module.js';
 import { AccountNature } from '../../modules/accounts/domain/enums/account-nature.enum.js';
 import { AccountLevel } from '../../modules/accounts/domain/enums/account-level.enum.js';
+import { AccountOrmEntity } from '../../modules/accounts/infrastructure/persistence/sqlite/entities/account.orm-entity.js';
+import { AccountingMovementOrmEntity } from '../../modules/accounts/infrastructure/persistence/sqlite/entities/accounting-movement.orm-entity.js';
 
 describe('AccountsGatewayController (Gateway Distribution Layer)', () => {
   let controller: AccountsGatewayController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AccountsModule],
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'better-sqlite3',
+          database: ':memory:',
+          entities: [AccountOrmEntity, AccountingMovementOrmEntity],
+          synchronize: true,
+          logging: false,
+        }),
+        AccountsModule,
+      ],
       controllers: [AccountsGatewayController],
     }).compile();
 
