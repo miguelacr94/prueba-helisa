@@ -40,26 +40,37 @@ Una vez ejecutado:
 
 ### Variables de Entorno (`.env`)
 
-Tanto el backend como el frontend están completamente parametrizados mediante variables de entorno, sin puertos ni URLs de API harcodeados:
+Tanto el backend como el frontend están completamente parametrizados mediante variables de entorno, **sin puertos, hosts, rutas de base de datos ni URLs de API harcodeados**. Cada subproyecto cuenta con su propia plantilla `.env.example`, y en la raíz del repositorio se dispone de una plantilla unificada.
 
-#### Backend (`api/.env` / `api/.env.example`)
-| Variable | Descripción | Valor por Defecto |
-| :--- | :--- | :--- |
-| `PORT` | Puerto HTTP donde escucha el servidor NestJS | `3000` |
-| `HOST` | Dirección de red / host del servidor | `0.0.0.0` |
-| `NODE_ENV` | Entorno de ejecución (`development`, `production`, `test`) | `development` |
-| `GLOBAL_PREFIX` | Prefijo global del API Gateway | `api/v1` |
-| `SWAGGER_PATH` | Ruta de la documentación interactiva Swagger | `docs` |
-| `CORS_ORIGIN` | Orígenes permitidos (separados por coma para múltiples) | `http://localhost:5173` |
-| `DATABASE_PATH` | Ruta del archivo de base de datos relacional SQLite | `puc.sqlite` |
+#### 1. Backend (`api/.env` / `api/.env.example`)
+| Variable | Tipo | Descripción | Valor por Defecto | Ejemplo / Uso |
+| :--- | :---: | :--- | :--- | :--- |
+| `PORT` | `number` | Puerto HTTP donde el servidor NestJS escucha peticiones | `3000` | `PORT=4000` |
+| `HOST` | `string` | Dirección IP o interfaz de red para el binding del servidor | `0.0.0.0` | `HOST=127.0.0.1` |
+| `NODE_ENV` | `string` | Entorno de ejecución (`development`, `production`, `test`) | `development` | `NODE_ENV=production` |
+| `GLOBAL_PREFIX` | `string` | Prefijo global del API Gateway para todas las rutas REST | `api/v1` | `GLOBAL_PREFIX=api/v2` |
+| `SWAGGER_PATH` | `string` | Ruta relativa para acceder a la documentación interactiva OpenAPI | `docs` | `SWAGGER_PATH=swagger` |
+| `CORS_ORIGIN` | `string` | Orígenes web autorizados para CORS (admite listas separadas por coma) | `http://localhost:5173` | `CORS_ORIGIN=http://localhost:5173,https://midominio.com` |
+| `DATABASE_PATH` | `string` | Ruta del archivo de base de datos SQLite relacional (`:memory:` para RAM) | `puc.sqlite` | `DATABASE_PATH=data/puc_prod.sqlite` |
 
-#### Frontend (`web/.env` / `web/.env.example`)
-| Variable | Descripción | Valor por Defecto |
-| :--- | :--- | :--- |
-| `VITE_PORT` | Puerto del servidor de desarrollo de Vite | `5173` |
-| `VITE_HOST` | Host para el servidor de desarrollo | `localhost` |
-| `VITE_API_URL` | URL base del servidor backend (API Gateway) | `http://localhost:3000` |
-| `VITE_API_PREFIX` | Prefijo de las rutas de la API consumidas por el cliente | `/api/v1` |
+#### 2. Frontend (`web/.env` / `web/.env.example`)
+| Variable | Tipo | Descripción | Valor por Defecto | Ejemplo / Uso |
+| :--- | :---: | :--- | :--- | :--- |
+| `VITE_PORT` | `number` | Puerto local en el que se levanta el servidor de desarrollo de Vite | `5173` | `VITE_PORT=8080` |
+| `VITE_HOST` | `string` | Host para el servidor de desarrollo de Vite | `localhost` | `VITE_HOST=0.0.0.0` |
+| `VITE_API_URL` | `string` | URL base del servidor backend (API Gateway) | `http://localhost:3000` | `VITE_API_URL=http://localhost:4000` |
+| `VITE_API_PREFIX` | `string` | Prefijo global consumido por el cliente HTTP (`HttpClient`) | `/api/v1` | `VITE_API_PREFIX=/api/v1` |
+
+#### Escenarios de Configuración Comunes
+
+- **Cambio de puertos para evitar colisiones (ej. Backend en `:4000` y Frontend en `:8080`):**
+  1. En `api/.env`: configurar `PORT=4000` y `CORS_ORIGIN=http://localhost:8080`.
+  2. En `web/.env`: configurar `VITE_PORT=8080` y `VITE_API_URL=http://localhost:4000`.
+- **Base de Datos en Directorio Personalizado:**
+  - En `api/.env`: `DATABASE_PATH=data/contabilidad_2026.sqlite`.
+- **Despliegue a Producción o Red Local:**
+  - En `api/.env`: `HOST=0.0.0.0` y `CORS_ORIGIN=https://app.helisa.com`.
+  - En `web/.env`: `VITE_API_URL=https://api.helisa.com`.
 
 ### Scripts disponibles
 
@@ -69,9 +80,9 @@ Tanto el backend como el frontend están completamente parametrizados mediante v
 | `npm run dev:api` | Levanta únicamente el backend en NestJS |
 | `npm run dev:web` | Levanta únicamente el frontend en React + Vite |
 | `npm run build` | Compila ambos proyectos (`nest build` y `vite build`) |
-| `npm test` | Ejecuta las pruebas unitarias del backend con Vitest (20 pruebas) |
+| `npm test` | Ejecuta las pruebas unitarias del backend con Vitest (26 pruebas en 8 suites) |
 | `npm run test:e2e --prefix api` | Ejecuta las pruebas de integración E2E del API Gateway |
-| `npm run lint` | Ejecuta el análisis estático de código con Oxlint en ambos proyectos |
+| `npm run lint` | Ejecuta el análisis estático de código con Oxlint en ambos proyectos (0 advertencias, 0 errores) |
 
 ---
 
