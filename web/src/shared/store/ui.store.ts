@@ -6,19 +6,25 @@ interface UiState {
   selectedAccount: Account | null;
   isCreateModalOpen: boolean;
   prefillParentCode: string | null;
+  prefillParentName: string | null;
+  isRenameModalOpen: boolean;
+  accountToRename: Account | null;
   isDeleteDialogOpen: boolean;
   accountToDelete: Account | null;
   expandedNodes: Record<string, boolean>;
 
   setSearchTerm: (term: string) => void;
   setSelectedAccount: (account: Account | null) => void;
-  openCreateModal: (parentCode?: string) => void;
+  openCreateModal: (parentCode?: string, parentName?: string) => void;
   closeCreateModal: () => void;
+  openRenameModal: (account: Account) => void;
+  closeRenameModal: () => void;
   openDeleteDialog: (account: Account) => void;
   closeDeleteDialog: () => void;
   toggleNode: (code: string) => void;
   expandAll: (codes: string[]) => void;
   collapseAll: () => void;
+  expandBranches: (codes: string[]) => void;
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -26,15 +32,25 @@ export const useUiStore = create<UiState>((set) => ({
   selectedAccount: null,
   isCreateModalOpen: false,
   prefillParentCode: null,
+  prefillParentName: null,
+  isRenameModalOpen: false,
+  accountToRename: null,
   isDeleteDialogOpen: false,
   accountToDelete: null,
   expandedNodes: {},
 
   setSearchTerm: (searchTerm) => set({ searchTerm }),
   setSelectedAccount: (selectedAccount) => set({ selectedAccount }),
-  openCreateModal: (prefillParentCode = '') =>
-    set({ isCreateModalOpen: true, prefillParentCode: prefillParentCode || null }),
-  closeCreateModal: () => set({ isCreateModalOpen: false, prefillParentCode: null }),
+  openCreateModal: (prefillParentCode = '', prefillParentName = '') =>
+    set({
+      isCreateModalOpen: true,
+      prefillParentCode: prefillParentCode || null,
+      prefillParentName: prefillParentName || null,
+    }),
+  closeCreateModal: () =>
+    set({ isCreateModalOpen: false, prefillParentCode: null, prefillParentName: null }),
+  openRenameModal: (accountToRename) => set({ isRenameModalOpen: true, accountToRename }),
+  closeRenameModal: () => set({ isRenameModalOpen: false, accountToRename: null }),
   openDeleteDialog: (accountToDelete) => set({ isDeleteDialogOpen: true, accountToDelete }),
   closeDeleteDialog: () => set({ isDeleteDialogOpen: false, accountToDelete: null }),
   toggleNode: (code) =>
@@ -51,4 +67,12 @@ export const useUiStore = create<UiState>((set) => ({
       return { expandedNodes: all };
     }),
   collapseAll: () => set({ expandedNodes: {} }),
+  expandBranches: (codes) =>
+    set((state) => {
+      const updated = { ...state.expandedNodes };
+      codes.forEach((c) => {
+        updated[c] = true;
+      });
+      return { expandedNodes: updated };
+    }),
 }));

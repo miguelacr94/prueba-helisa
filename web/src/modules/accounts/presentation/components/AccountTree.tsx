@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Search,
   ChevronsDown,
@@ -18,8 +18,48 @@ interface AccountTreeProps {
 }
 
 export const AccountTree: React.FC<AccountTreeProps> = ({ tree, isLoading }) => {
-  const { searchTerm, setSearchTerm, expandAll, collapseAll, openCreateModal } = useUiStore();
+  const {
+    searchTerm,
+    setSearchTerm,
+    expandAll,
+    collapseAll,
+    openCreateModal,
+    expandBranches,
+  } = useUiStore();
   const createMutation = useCreateAccount();
+
+  // Abrir automáticamente las ramas donde hay coincidencia de búsqueda por código o nombre
+  useEffect(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term || tree.length === 0) return;
+
+    const matchedAncestors: string[] = [];
+
+    const searchAndCollectAncestors = (
+      nodes: IAccountTreeNode[],
+      ancestors: string[],
+    ) => {
+      for (const node of nodes) {
+        const matches =
+          node.code.toLowerCase().includes(term) ||
+          node.name.toLowerCase().includes(term);
+
+        if (matches && ancestors.length > 0) {
+          matchedAncestors.push(...ancestors);
+        }
+
+        if (node.children?.length) {
+          searchAndCollectAncestors(node.children, [...ancestors, node.code]);
+        }
+      }
+    };
+
+    searchAndCollectAncestors(tree, []);
+
+    if (matchedAncestors.length > 0) {
+      expandBranches(matchedAncestors);
+    }
+  }, [searchTerm, tree, expandBranches]);
 
   // Recolectar todos los códigos para expandAll
   const allCodes = useMemo(() => {

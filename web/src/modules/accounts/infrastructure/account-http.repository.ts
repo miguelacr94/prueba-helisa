@@ -25,6 +25,10 @@ export class AccountHttpRepository implements IAccountRepository {
     return this.client.post<Account>('/accounts', payload);
   }
 
+  async rename(code: string, newName: string): Promise<Account> {
+    return this.client.patch<Account>(`/accounts/${code}`, { name: newName });
+  }
+
   async delete(code: string): Promise<{ message: string }> {
     return this.client.delete<{ message: string }>(`/accounts/${code}`);
   }

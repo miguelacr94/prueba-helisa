@@ -4,6 +4,7 @@ import { useAccountsTree } from '../application/hooks/use-accounts-tree.hook';
 import { AccountTree } from './components/AccountTree';
 import { AccountFormModal } from './components/AccountFormModal';
 import { AccountDeleteDialog } from './components/AccountDeleteDialog';
+import { AccountRenameModal } from './components/AccountRenameModal';
 import { BookMarked, Layers, ShieldCheck, GitBranch } from 'lucide-react';
 
 export const AccountsPage: React.FC = () => {
@@ -82,6 +83,7 @@ export const AccountsPage: React.FC = () => {
 
       {/* Modales */}
       <AccountFormModal />
+      <AccountRenameModal />
       <AccountDeleteDialog />
     </div>
   );

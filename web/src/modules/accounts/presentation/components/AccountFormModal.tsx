@@ -16,7 +16,7 @@ import {
 import { ApiException } from '../../../../shared/api/http-client';
 
 export const AccountFormModal: React.FC = () => {
-  const { isCreateModalOpen, closeCreateModal, prefillParentCode } = useUiStore();
+  const { isCreateModalOpen, closeCreateModal, prefillParentCode, prefillParentName } = useUiStore();
   const createMutation = useCreateAccount();
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -129,6 +129,22 @@ export const AccountFormModal: React.FC = () => {
       subtitle="Complete los datos para agregar una cuenta al catálogo PUC."
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left">
+        {/* Banner contextual de Creación de Hija */}
+        {prefillParentCode && (
+          <div className="p-3 bg-indigo-50/80 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-start space-x-2.5 animate-fade-in shadow-2xs">
+            <Info className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">
+                Creando cuenta dependiente de: <span className="font-mono text-indigo-700">{prefillParentCode}</span>
+                {prefillParentName ? ` (${prefillParentName})` : ''}
+              </p>
+              <p className="text-[11px] text-indigo-600 mt-0.5">
+                El prefijo ha sido prellenado. Complete los dígitos para alcanzar el siguiente nivel.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Alerta de Error General si no corresponde a un campo específico */}
         {generalError && (
           <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start space-x-2 text-rose-800 text-sm animate-fade-in">

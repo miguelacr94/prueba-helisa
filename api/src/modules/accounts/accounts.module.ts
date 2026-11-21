@@ -6,6 +6,7 @@ import { FindAllAccountsUseCase } from './application/use-cases/find-all-account
 import { FindAccountByCodeUseCase } from './application/use-cases/find-account-by-code.use-case.js';
 import { GetAccountTreeUseCase } from './application/use-cases/get-account-tree.use-case.js';
 import { DeleteAccountUseCase } from './application/use-cases/delete-account.use-case.js';
+import { RenameAccountUseCase } from './application/use-cases/rename-account.use-case.js';
 
 @Module({
   providers: [
@@ -18,6 +19,7 @@ import { DeleteAccountUseCase } from './application/use-cases/delete-account.use
     FindAccountByCodeUseCase,
     GetAccountTreeUseCase,
     DeleteAccountUseCase,
+    RenameAccountUseCase,
   ],
   exports: [
     CreateAccountUseCase,
@@ -25,6 +27,7 @@ import { DeleteAccountUseCase } from './application/use-cases/delete-account.use
     FindAccountByCodeUseCase,
     GetAccountTreeUseCase,
     DeleteAccountUseCase,
+    RenameAccountUseCase,
     ACCOUNT_REPOSITORY_TOKEN,
   ],
 })

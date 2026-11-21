@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import {
@@ -17,11 +18,13 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { CreateAccountRequestDto } from '../dtos/create-account-request.dto.js';
+import { RenameAccountRequestDto } from '../dtos/rename-account-request.dto.js';
 import { CreateAccountUseCase } from '../../modules/accounts/application/use-cases/create-account.use-case.js';
 import { FindAllAccountsUseCase } from '../../modules/accounts/application/use-cases/find-all-accounts.use-case.js';
 import { FindAccountByCodeUseCase } from '../../modules/accounts/application/use-cases/find-account-by-code.use-case.js';
 import { GetAccountTreeUseCase } from '../../modules/accounts/application/use-cases/get-account-tree.use-case.js';
 import { DeleteAccountUseCase } from '../../modules/accounts/application/use-cases/delete-account.use-case.js';
+import { RenameAccountUseCase } from '../../modules/accounts/application/use-cases/rename-account.use-case.js';
 
 @ApiTags('Cuentas Contables (PUC)')
 @Controller('accounts')
@@ -32,6 +35,7 @@ export class AccountsGatewayController {
     private readonly findAccountByCodeUseCase: FindAccountByCodeUseCase,
     private readonly getAccountTreeUseCase: GetAccountTreeUseCase,
     private readonly deleteAccountUseCase: DeleteAccountUseCase,
+    private readonly renameAccountUseCase: RenameAccountUseCase,
   ) {}
 
   @Post()
@@ -84,6 +88,25 @@ export class AccountsGatewayController {
   @ApiResponse({ status: 404, description: 'Cuenta no encontrada.' })
   async findByCode(@Param('code') code: string) {
     return this.findAccountByCodeUseCase.execute(code);
+  }
+
+  @Patch(':code')
+  @ApiOperation({
+    summary: 'Renombrar una cuenta contable',
+    description: 'Actualiza el nombre descriptivo de una cuenta existente en el catálogo.',
+  })
+  @ApiParam({ name: 'code', description: 'Código de la cuenta a renombrar', example: '1105' })
+  @ApiResponse({ status: 200, description: 'Cuenta renombrada exitosamente.' })
+  @ApiResponse({ status: 400, description: 'Nombre inválido o vacío.' })
+  @ApiResponse({ status: 404, description: 'Cuenta no encontrada.' })
+  async renameAccount(
+    @Param('code') code: string,
+    @Body() dto: RenameAccountRequestDto,
+  ) {
+    return this.renameAccountUseCase.execute({
+      code,
+      newName: dto.name,
+    });
   }
 
   @Delete(':code')
