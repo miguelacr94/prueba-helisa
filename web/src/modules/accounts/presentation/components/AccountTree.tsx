@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Search,
   ChevronsDown,
@@ -19,90 +19,20 @@ interface AccountTreeProps {
   isLoading: boolean;
 }
 
-/**
- * Obtiene los códigos ancestros de una cuenta según los niveles del PUC colombiano:
- * Clase (1) -> Grupo (2) -> Cuenta (4) -> Subcuenta (6)
- */
-function getAncestorCodes(code: string): string[] {
-  const ancestors: string[] = [];
-  if (code.length === 6) {
-    ancestors.push(code.substring(0, 1), code.substring(0, 2), code.substring(0, 4));
-  } else if (code.length === 4) {
-    ancestors.push(code.substring(0, 1), code.substring(0, 2));
-  } else if (code.length === 2) {
-    ancestors.push(code.substring(0, 1));
-  }
-  return ancestors;
-}
-
 export const AccountTree: React.FC<AccountTreeProps> = ({ tree, isLoading }) => {
-  const {
-    searchTerm,
-    setSearchTerm,
-    setMatchedCodes,
-    expandAll,
-    collapseAll,
-    openCreateModal,
-    expandBranches,
-  } = useUiStore();
+  const { searchTerm, setSearchTerm, expandAll, collapseAll, openCreateModal } = useUiStore();
 
   const createMutation = useCreateAccount();
 
   // Búsqueda con debounce vía API
   const { debouncedTerm, isDebouncing, isSearching, searchResults } = useSearchAccounts(searchTerm);
+  const isFiltering = searchTerm.trim() !== '';
 
-  // Sincronizar coincidencias devueltas por la API y autoexpandir sus ramas
-  useEffect(() => {
-    if (!debouncedTerm) {
-      setMatchedCodes([]);
-      return;
-    }
-
-    const matched = searchResults.map((acc) => acc.code);
-    setMatchedCodes(matched);
-
-    if (matched.length > 0) {
-      const ancestorsToExpand = Array.from(
-        new Set(searchResults.flatMap((acc) => getAncestorCodes(acc.code))),
-      );
-      if (ancestorsToExpand.length > 0) {
-        expandBranches(ancestorsToExpand);
-      }
-    }
-  }, [debouncedTerm, searchResults, setMatchedCodes, expandBranches]);
-
-  // Recorrido local complementario para feedback instantáneo mientras se tipea
-  useEffect(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term || tree.length === 0) return;
-
-    const matchedAncestors: string[] = [];
-
-    const searchAndCollectAncestors = (
-      nodes: IAccountTreeNode[],
-      ancestors: string[],
-    ) => {
-      for (const node of nodes) {
-        const matches =
-          node.code.toLowerCase().includes(term) ||
-          node.name.toLowerCase().includes(term);
-
-        if (matches && ancestors.length > 0) {
-          matchedAncestors.push(...ancestors);
-        }
-
-        if (node.children?.length) {
-          searchAndCollectAncestors(node.children, [...ancestors, node.code]);
-        }
-      }
-    };
-
-    searchAndCollectAncestors(tree, []);
-
-    if (matchedAncestors.length > 0) {
-      expandBranches(matchedAncestors);
-    }
-  }, [searchTerm, tree, expandBranches]);
+  // Resultados filtrados de la API presentados como nodos planos (solo las cuentas encontradas)
+  const filteredNodes = useMemo<IAccountTreeNode[]>(
+    () => searchResults.map((account) => ({ ...account, children: [] })),
+    [searchResults],
+  );
 
   // Recolectar todos los códigos para expandAll
   const allCodes = useMemo(() => {
@@ -301,6 +231,27 @@ export const AccountTree: React.FC<AccountTreeProps> = ({ tree, isLoading }) => 
               <span>Cargar PUC de Ejemplo</span>
             </button>
           </div>
+        </div>
+      ) : isFiltering ? (
+        <div className="bg-slate-50/50 rounded-2xl border border-slate-200/90 p-2 sm:p-4 shadow-xs">
+          {filteredNodes.length > 0 ? (
+            <div className="space-y-1">
+              {filteredNodes.map((node) => (
+                <AccountTreeNode key={node.code} node={node} depth={0} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-10 text-center text-sm text-slate-500">
+              {isDebouncing || isSearching ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                  Buscando cuentas...
+                </span>
+              ) : (
+                <>No se encontraron cuentas para &quot;{debouncedTerm}&quot;.</>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <div className="bg-slate-50/50 rounded-2xl border border-slate-200/90 p-2 sm:p-4 shadow-xs">

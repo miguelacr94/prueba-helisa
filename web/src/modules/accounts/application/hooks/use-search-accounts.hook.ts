@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useDebounce } from '../../../../shared/hooks/use-debounce.hook';
 import { accountRepository } from '../../infrastructure/account-http.repository';
 import type { Account } from '../../domain/models/account.model';
@@ -32,6 +32,7 @@ export function useSearchAccounts(searchTerm: string, delay = 350): UseSearchAcc
     queryFn: () => accountRepository.search(debouncedTerm),
     enabled: debouncedTerm.length > 0,
     staleTime: 1000 * 30, // 30 segundos en caché
+    placeholderData: keepPreviousData, // Mantiene los resultados previos mientras llega la nueva consulta
   });
 
   return {

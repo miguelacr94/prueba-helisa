@@ -27,8 +27,6 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
     openCreateModal,
     openRenameModal,
     openDeleteDialog,
-    searchTerm,
-    matchedCodes,
   } = useUiStore();
 
   const isExpanded = expandedNodes[node.code] ?? true;
@@ -38,23 +36,11 @@ export const AccountTreeNode: React.FC<AccountTreeNodeProps> = ({ node, depth = 
   const levelInfo = getLevelBadgeStyle(node.level);
   const isNatureDebit = node.nature === 'DEBITO';
 
-  // Highlight search: coincide vía API (matchedCodes) o filtro reactivo preventivo
-  const cleanSearch = searchTerm.trim().toLowerCase();
-  const isSearchMatch =
-    cleanSearch !== '' &&
-    (matchedCodes.includes(node.code) ||
-      node.code.toLowerCase().includes(cleanSearch) ||
-      node.name.toLowerCase().includes(cleanSearch));
-
   return (
     <div className="select-none transition-colors">
       <div
         style={{ '--tree-depth': depth } as React.CSSProperties}
-        className={`group flex flex-col sm:flex-row items-start sm:items-center justify-between py-2 sm:py-2 px-2.5 sm:px-3 rounded-xl border transition-all ${
-          isSearchMatch
-            ? 'bg-amber-50/80 border-amber-300 ring-2 ring-amber-100'
-            : 'bg-white hover:bg-slate-50/80 border-slate-200/80 hover:border-slate-300'
-        } mb-1.5 shadow-2xs gap-1.5 sm:gap-2 ml-[calc(var(--tree-depth)*8px)] sm:ml-[calc(var(--tree-depth)*20px)]`}
+        className={`group flex flex-col sm:flex-row items-start sm:items-center justify-between py-2 sm:py-2 px-2.5 sm:px-3 rounded-xl border transition-all bg-white hover:bg-slate-50/80 border-slate-200/80 hover:border-slate-300 mb-1.5 shadow-2xs gap-1.5 sm:gap-2 ml-[calc(var(--tree-depth)*8px)] sm:ml-[calc(var(--tree-depth)*20px)]`}
       >
         {/* Lado izquierdo (Fila 1 en móvil): Chevron, Icono, Código, Nombre, Nivel */}
         <div className="flex items-center space-x-2 min-w-0 w-full sm:w-auto sm:flex-1">

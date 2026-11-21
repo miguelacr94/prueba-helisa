@@ -3,7 +3,6 @@ import type { Account } from '../../modules/accounts/domain/models/account.model
 
 interface UiState {
   searchTerm: string;
-  matchedCodes: string[];
   selectedAccount: Account | null;
   isCreateModalOpen: boolean;
   prefillParentCode: string | null;
@@ -15,7 +14,6 @@ interface UiState {
   expandedNodes: Record<string, boolean>;
 
   setSearchTerm: (term: string) => void;
-  setMatchedCodes: (codes: string[]) => void;
   setSelectedAccount: (account: Account | null) => void;
   openCreateModal: (parentCode?: string, parentName?: string) => void;
   closeCreateModal: () => void;
@@ -31,7 +29,6 @@ interface UiState {
 
 export const useUiStore = create<UiState>((set) => ({
   searchTerm: '',
-  matchedCodes: [],
   selectedAccount: null,
   isCreateModalOpen: false,
   prefillParentCode: null,
@@ -42,19 +39,7 @@ export const useUiStore = create<UiState>((set) => ({
   accountToDelete: null,
   expandedNodes: {},
 
-  setSearchTerm: (searchTerm) =>
-    set((state) => ({
-      searchTerm,
-      matchedCodes: searchTerm.trim() === '' ? [] : state.matchedCodes,
-    })),
-  setMatchedCodes: (matchedCodes) =>
-    set((state) => {
-      const isSame =
-        state.matchedCodes.length === matchedCodes.length &&
-        state.matchedCodes.every((code, i) => code === matchedCodes[i]);
-      // Retornar el mismo estado evita notificaciones y re-renders innecesarios
-      return isSame ? state : { matchedCodes };
-    }),
+  setSearchTerm: (searchTerm) => set({ searchTerm }),
   setSelectedAccount: (selectedAccount) => set({ selectedAccount }),
   openCreateModal: (prefillParentCode = '', prefillParentName = '') =>
     set({
